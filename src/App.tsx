@@ -1,9 +1,11 @@
+import { Box } from "@mui/material";
+import FormAddCar from "./components/FormAddCar";
 
 const App = () => {
   return (
-    <div>
-      react project
-    </div>
+    <Box style={{ width: '100%'}}>
+      <FormAddCar />
+    </Box>
   );
 }
 
