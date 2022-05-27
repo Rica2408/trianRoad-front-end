@@ -3,6 +3,8 @@ import { Box } from "@mui/system"
 import { Dispatch, SetStateAction, useState } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
+import { TrainType } from "../InputTrain/InputTypes"
+import { getOrderData, getUser } from "../services/services"
 
 type ButtonType = {
   name: string
@@ -10,8 +12,7 @@ type ButtonType = {
 }
 
 const OrderTrain = () => {
-  const train = useSelector((state: RootState) => state.train)
-
+  const train = useSelector((state: RootState) => state.train.value)
   const [finalOrderDestination, setFinalOrderDestination] = useState<string[]>([])
   const [finalOrderReceiver, setFinalOrderReceiver] = useState<string[]>([])
 
@@ -69,6 +70,16 @@ const OrderTrain = () => {
       return aux
     })
   }
+
+  const orderTrains = async () => {
+    const parameters = {
+      orderDestination: finalOrderDestination,
+      orderReceiver: finalOrderReceiver
+    }
+    const newDta = await getOrderData(train, parameters)
+    // const newDta = await getUser()
+    console.log(newDta)
+  }
   
   return (
     <Box style={{display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'}}>
@@ -102,7 +113,10 @@ const OrderTrain = () => {
           ))}
         </Box>
       </Box>
-      <Button>Order</Button>
+      <Button onClick={orderTrains}>Order</Button>
+      <Box>
+        
+      </Box>
     </Box>
   )
 }
