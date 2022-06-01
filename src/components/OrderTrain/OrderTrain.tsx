@@ -1,9 +1,11 @@
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { Box } from "@mui/system"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
 import { getOrderData } from "../services/services"
+import { getDestinationsService } from "../services/servicesDestination"
+import { getReceiversService } from "../services/servicesReceiver"
 
 type ButtonType = {
   name: string
@@ -52,6 +54,37 @@ const OrderTrain = () => {
       disable: false
     }
   ])
+
+  useEffect(() => {
+    const resDestination = async() => {
+      const dataDestination = await getDestinationsService()
+      if (dataDestination) {
+        const transformDestiantion = dataDestination.map(x => {
+          return {
+            name: x.destination,
+            disable: false
+          }
+        })
+        setOrderDestination(transformDestiantion)
+      }
+    }
+
+    const resReceiver = async() => {
+      const dataReceiver = await getReceiversService()
+      if (dataReceiver) {
+        const transformReceiver = dataReceiver.map(x => {
+          return {
+            name: x.receiver,
+            disable: false
+          }
+        })
+        setOrderReceiver(transformReceiver)
+      }
+    }
+
+    resDestination()
+    resReceiver()
+  },[])
 
   const handlerDisabled = (name: string, setOrderDestination: Dispatch<SetStateAction<ButtonType[]>>, setFinalOrder: Dispatch<SetStateAction<string[]>>) => {
     setOrderDestination(value => {
