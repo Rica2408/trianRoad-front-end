@@ -37,7 +37,7 @@ export const addReceiverService =  async (receiver: string): Promise<ItemType | 
 
 export const updateReceiverService = async (id: string, receiver: string): Promise<ItemType | null> => {
   try {
-    const response = await axios.patch<ItemType>(`${URL}/${id}`, {
+    const response = await axios.put<ItemType>(`${URL}/${id}`, {
       receiver
     })
 

@@ -37,7 +37,7 @@ export const addDestiantionService =  async (destination: string): Promise<ItemT
 
 export const updateDestinationService = async (id: string, destination: string): Promise<ItemType | null> => {
   try {
-    const response = await axios.patch<ItemType>(`${URL}/${id}`, {
+    const response = await axios.put<ItemType>(`${URL}/${id}`, {
       destination
     })
 
