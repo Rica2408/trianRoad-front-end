@@ -1,20 +1,27 @@
-import { Button } from "@mui/material"
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { Box } from "@mui/system"
 import { Dispatch, SetStateAction, useState } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store"
-import { TrainType } from "../InputTrain/InputTypes"
-import { getOrderData, getUser } from "../services/services"
+import { getOrderData } from "../services/services"
 
 type ButtonType = {
   name: string
   disable: boolean
 }
 
+type OrderDataType = {
+  classificationTrack: number
+  nameOfCar: string
+  destination: string
+  receiver: string
+}
+
 const OrderTrain = () => {
   const train = useSelector((state: RootState) => state.train.value)
   const [finalOrderDestination, setFinalOrderDestination] = useState<string[]>([])
   const [finalOrderReceiver, setFinalOrderReceiver] = useState<string[]>([])
+  const [orderData, setOrderData] = useState<OrderDataType[]>([]) 
 
   const [orderDestination, setOrderDestination] = useState<ButtonType[]>([
     {
@@ -72,13 +79,8 @@ const OrderTrain = () => {
   }
 
   const orderTrains = async () => {
-    const parameters = {
-      orderDestination: finalOrderDestination,
-      orderReceiver: finalOrderReceiver
-    }
-    const newDta = await getOrderData(train, parameters)
-    // const newDta = await getUser()
-    console.log(newDta)
+    const newData = await getOrderData(train, finalOrderDestination, finalOrderReceiver)
+    setOrderData(newData)
   }
   
   return (
@@ -115,7 +117,31 @@ const OrderTrain = () => {
       </Box>
       <Button onClick={orderTrains}>Order</Button>
       <Box>
-        
+        <TableContainer style={{display: 'flex', justifyContent: 'center'}}>
+          <Table sx={{ width: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Classification Track</TableCell>
+                <TableCell align="right">Car Name</TableCell>
+                <TableCell align="right">Destination</TableCell>
+                <TableCell align="right">Receiver</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {orderData.map((element, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, width: 650 }}
+                >
+                  <TableCell component="th" scope="row">{element.classificationTrack}</TableCell>
+                  <TableCell align="right">{element.nameOfCar}</TableCell>
+                  <TableCell align="right">{element.destination}</TableCell>
+                  <TableCell align="right">{element.receiver}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Box>
     </Box>
   )

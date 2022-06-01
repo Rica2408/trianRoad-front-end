@@ -27,7 +27,7 @@ const FormAddCar = () => {
   const handlerOnClick = () => {
     setCarTrain(value => {
       const newCar: TrainType = {
-        carName: value ? value.length + 1 : 1,
+        nameOfCar: value ? value.length + 1 : 1,
         destination,
         receiver,
       } 

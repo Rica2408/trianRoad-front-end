@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 
 export type TrainType = {
-  carName: number
+  nameOfCar: number
   destination: string
   receiver: string
 }
