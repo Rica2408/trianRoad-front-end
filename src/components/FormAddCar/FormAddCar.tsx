@@ -1,42 +1,53 @@
 import { Box, Button, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import InputTrain from "../InputTrain"
 import { TrainType } from '../InputTrain/InputTypes'
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addData } from '../../reducers/trainReducer'
-
-type DestinationTypes = 'Houston' | 'LA' | 'Chicago' | ''
-type ReceiversTypes = 'UPS' | 'Old Dominion' | 'Fedex' | ''
+import { getDestinationsService } from "../services/servicesDestination";
+import { getReceiversService } from "../services/servicesReceiver";
+import { addCarService, getCarsService } from "../services/servicesCar";
 
 const FormAddCar = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [destination, setDestination] = useState<DestinationTypes>('')
-  const [receiver, setReceiver] = useState<ReceiversTypes>('')
+  const [destination, setDestination] = useState('')
+  const [receiver, setReceiver] = useState('')
   const [carTrain, setCarTrain] = useState<TrainType[]>()
+  const [listDestination, setLisDestination] = useState<string[]>([])
+  const [listReceiver, setLisReceiver] = useState<string[]>([])
 
-  const handlerDestination = (event: SelectChangeEvent<DestinationTypes>): void => {
-    setDestination(event.target.value as DestinationTypes)
+  const handlerDestination = (event: SelectChangeEvent<string>): void => {
+    setDestination(event.target.value)
   }
 
-  const handlerReceiver = (event: SelectChangeEvent<ReceiversTypes>): void => {
-    setReceiver(event.target.value as ReceiversTypes)
+  const handlerReceiver = (event: SelectChangeEvent<string>): void => {
+    setReceiver(event.target.value)
   }
 
-  const handlerOnClick = () => {
-    setCarTrain(value => {
-      const newCar: TrainType = {
-        nameOfCar: value ? value.length + 1 : 1,
-        destination,
-        receiver,
-      } 
-      if (value) {
-        return [...value, newCar]
-      } else {
-        return [newCar]
-      }
+  const handlerOnClick = async () => {
+    const res = await addCarService({
+      nameOfCar: carTrain ? (carTrain.length + 1).toString() : '0',
+      destination: destination,
+      receiver: receiver
     })
+
+    if (res) {
+      setCarTrain(value => {
+        const newCar: TrainType = {
+          nameOfCar: value ? (value.length + 1).toString() : '1',
+          destination,
+          receiver,
+          id: res.id
+        } 
+        if (value) {
+          return [...value, newCar]
+        } else {
+          return [newCar]
+        }
+      })
+    }
     setDestination('')
     setReceiver('')
   }
@@ -48,9 +59,41 @@ const FormAddCar = () => {
     navigate('/order')
   }
 
+  useEffect(() => {
+    const resCars = async () => {
+      const dataCars = await getCarsService()
+      if (dataCars) {
+        setCarTrain(dataCars)
+      }
+    }
+    const resDestination = async() => {
+      const dataDestination = await getDestinationsService()
+      if (dataDestination) {
+        const transformDestiantion = dataDestination.map(x => {
+          return x.destination
+        })
+        setLisDestination(transformDestiantion)
+      }
+    }
+
+    const resReceiver = async() => {
+      const dataReceiver = await getReceiversService()
+      if (dataReceiver) {
+        const transformReceiver = dataReceiver.map(x => {
+          return x.receiver
+        })
+        setLisReceiver(transformReceiver)
+      }
+    }
+
+    resCars()
+    resDestination()
+    resReceiver()
+  },[])
+
   return (
     <Box>
-      <Box display='flex' flexDirection='row' justifyContent='center'>
+      <Box display='flex' flexDirection='row' justifyContent='center' marginTop={10}>
         <Box style={{width: 300}}>
           <InputLabel id="select-label">Destination</InputLabel>
           <Select
@@ -60,9 +103,9 @@ const FormAddCar = () => {
             onChange={handlerDestination}
             value={destination}
           >
-            <MenuItem value='Houston'>Houston</MenuItem>
-            <MenuItem value='LA'>LA</MenuItem>
-            <MenuItem value='Chicago'>Chicago</MenuItem>
+            {listDestination.map(x => (
+              <MenuItem key={x} value={x}>{x}</MenuItem>
+            ))}
           </Select>
         </Box>
         <Box style={{width: 300}}>
@@ -74,15 +117,17 @@ const FormAddCar = () => {
             onChange={handlerReceiver}
             value={receiver}
           >
-            <MenuItem value='UPS'>UPS</MenuItem>
-            <MenuItem value='Old Dominion'>Old Dominion</MenuItem>
-            <MenuItem value='Fedex'>Fedex</MenuItem>
+            {listReceiver.map(x => (
+              <MenuItem key={x} value={x}>{x}</MenuItem>
+            ))}
           </Select>
         </Box>
         <Button disabled={!destination || !receiver} onClick={handlerOnClick} >Add Car</Button>
       </Box>
       <InputTrain elements={carTrain} setCarTrain={setCarTrain} />
-      <Button onClick={goToOrder}>Finish package</Button>
+      <Box display='flex' justifyContent='center'>
+        <Button onClick={goToOrder}>Finish package</Button>
+      </Box>
     </Box>
   )
 }

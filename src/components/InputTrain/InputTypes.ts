@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction } from "react"
 
 export type TrainType = {
-  nameOfCar: number
+  nameOfCar: string
   destination: string
   receiver: string
+  id?: string
 }
 
 export type InputTrainProps = {

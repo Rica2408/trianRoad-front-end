@@ -7,19 +7,23 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { HighlightOff} from '@mui/icons-material';
+import { deleteCarService } from "../services/servicesCar";
 
 const InputTrain: FC<InputTrainProps> = ({elements, setCarTrain}) => {
 
-  const deleteItem = (index: number): void => {
-    setCarTrain(value => {
-      if (value) {
-          const aux = [...value]
-          aux.splice(index, 1)
-          return aux
-        
-      }
-      return undefined
-    })
+  const deleteItem = async (id: string, index: number): Promise<void> => {
+    const res = await deleteCarService(id)
+    if (res) {
+      setCarTrain(value => {
+        if (value) {
+            const aux = [...value]
+            aux.splice(index, 1)
+            return aux
+          
+        }
+        return undefined
+      })
+    }
   }
 
   return(
@@ -42,7 +46,7 @@ const InputTrain: FC<InputTrainProps> = ({elements, setCarTrain}) => {
             <TableCell component="th" scope="row">{index + 1}</TableCell>
             <TableCell align="right">{element.destination}</TableCell>
             <TableCell align="right">{element.receiver}</TableCell>
-            <TableCell onClick={() => deleteItem(index)} align="right"><HighlightOff /></TableCell>
+            <TableCell onClick={() => deleteItem(element.id ?? '', index)} align="right"><HighlightOff /></TableCell>
           </TableRow>
         ))}
       </TableBody>
